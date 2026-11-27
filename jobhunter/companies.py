@@ -65,7 +65,6 @@ GREENHOUSE = [
     "helsing",            # added by find_companies
     "ionos",            # added by find_companies
     "nebius",            # added by find_companies
-    "parloa",            # added by find_companies
     "qualtrics",            # added by find_companies
     "rtbhouse",            # added by find_companies
     "tailscale",            # added by find_companies
@@ -126,7 +125,6 @@ GREENHOUSE = [
     "eversports",            # added by find_companies
     "flaconi",            # added by find_companies
     "freenow",            # added by find_companies
-    "gigs",            # added by find_companies
     "gostudent",            # added by find_companies
     "housemarque",            # added by find_companies
     "kununu",            # added by find_companies
@@ -400,7 +398,6 @@ RECRUITEE = [
     "dpgmedia",            # added by find_companies
     "pvcase",            # added by find_companies
     "epilot",            # added by find_companies
-    "ey",            # added by find_companies
     "fastned",            # added by find_companies
     "funda",            # added by find_companies
     "insidem2m",            # added by find_companies
@@ -409,7 +406,6 @@ RECRUITEE = [
     "lillydoo",            # added by find_companies
     "limehome",            # added by find_companies
     "mirka",            # added by find_companies
-    "naxcon",            # added by find_companies
     "nmbrs",            # added by find_companies
     "sharpist",            # added by find_companies
     "squla",            # added by find_companies
@@ -417,7 +413,6 @@ RECRUITEE = [
     "vandebron",            # added by find_companies
     "voltaira",            # added by find_companies
     "ingestro",            # added by detect_ats
-    "accenture",            # added by find_companies
     "berlinmetropolitanschool",            # added by find_companies
     "cloudpunks",            # added by find_companies
     "effectory",            # added by find_companies
@@ -714,7 +709,7 @@ PHENOM = [            # big-company career sites on Phenom (found by tools/detec
     "careers.hugoboss.com",            # added by detect_ats
 ]
 SUCCESSFACTORS = [    # SAP SuccessFactors "Career Site Builder" sites (found by tools/detect_ats.py)
-    "basf.jobs", "careers.eon.com", "careers.faurecia.com", "careers.jenoptik.com", "jobs.hannover-re.com",
+    "basf.jobs", "careers.faurecia.com", "careers.jenoptik.com", "jobs.hannover-re.com",
     "jobs.kpmg.de", "jobs.nordex-online.com", "jobs.prosiebensat1.com", "jobs.rational-online.com",
     "jobs.schaeffler.com", "jobs.uniper.energy", "jobs.vaillant-group.com", "jobs.volkswagen-group.com",
     "jobs.wacker.com", "jobs.zf.com", "www.jobs.atlascopcogroup.com", "jobs.bilfinger.com", "jobs.epo.org",

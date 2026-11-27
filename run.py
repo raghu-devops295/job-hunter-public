@@ -62,6 +62,12 @@ def fetch_everything() -> list[dict]:
     print(f"    {len(found)} jobs")
     if not_found:
         print(f"    not found (delete these from WORKDAY in companies.py): {', '.join(not_found)}")
+    if workday.blocked:
+        if len(workday.blocked) == len(companies.WORKDAY):
+            print(f"    ! Workday blocked this IP for all {len(workday.blocked)} sites ({workday.blocked[0].split('(')[-1].rstrip(')')})"
+                  f" - set the WORKDAY_PROXY secret or use a self-hosted runner (see jobhunter/sources/workday.py)")
+        else:
+            print(f"    ! blocked or failed (do NOT delete, try again later): {', '.join(workday.blocked)}")
     jobs += found
 
     print("4/5 Job boards (Remotive, RemoteOK, Himalayas, Jobicy, NoFluffJobs, JustJoin.it, WeWorkRemotely, Working Nomads)...")
