@@ -36,7 +36,7 @@ FACTS = _FACTS_FILE.read_text(encoding="utf-8")
 CACHE_FILE = Path("data/fit_cache.json")
 CACHE_VERSION = 8            # bump this when the questions change -> old answers get re-checked
 
-MAX_CHECKS_PER_RUN = 50      # free tier has daily limits - new jobs are checked first
+MAX_CHECKS_PER_RUN = int(os.environ.get("MAX_FIT_CHECKS") or 100)   # best-ranked new jobs first; the rest are checked next run (cache)
 PAUSE_SECONDS = 7            # ~8 requests per minute
 
 PROMPT = """You are a strict technical recruiter. Compare a job description with a candidate's verified facts.
@@ -96,7 +96,7 @@ def _ask_gemini(job: dict) -> dict:
 # Time budget for one robot run's Gemini calls (set by add_fit). When Google is overloaded (503 for many
 # minutes) the run must not hang until GitHub's 45-minute limit kills it and nothing is published.
 _DEADLINE: float | None = None
-BUDGET_MINUTES = float(os.environ.get("GEMINI_BUDGET_MINUTES") or 12)
+BUDGET_MINUTES = float(os.environ.get("GEMINI_BUDGET_MINUTES") or 20)   # Actions minutes are free in the public repo
 MAX_FAILS_IN_A_ROW = 2
 
 
