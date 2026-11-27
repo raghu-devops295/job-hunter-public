@@ -56,7 +56,7 @@ This repo is public so GitHub Actions runs here are free. Everything personal st
 | `Relay` workflow: the `tailor` / `needs-text` labels start the workflows here | |
 
 Setup: a fine-grained token with **Contents, Issues and Actions: read and write** on both repos, saved as the secret
-`DATA_REPO_TOKEN` here and `PUBLIC_REPO_TOKEN` in the private repo. Without the private files the code uses
+`DATA_REPO_TOKEN` here and `PUBLIC_REPO_TOKEN` in the private repo. **The current token expires on 25 Feb 2027**: then regenerate it (Settings → Developer settings → Fine-grained tokens → Regenerate) and update both secrets. Without the private files the code uses
 `jobhunter/resume.example.yaml` and `jobhunter/facts.example.md` (a made-up person), which is what the tests use.
 
 ## Workflows
