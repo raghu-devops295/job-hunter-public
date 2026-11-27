@@ -58,5 +58,5 @@ jobs:
             python tailor.py --issue "$n" >> fill-output.txt 2>&1 || echo "  (could not tailor #$n)" >> fill-output.txt
           done
           python tools/save_log.py fill-output.txt fill-job-text
-          echo "Finished with exit code $status (details: logs/last-fill-job-text.txt in the private repo)."
+          echo "Finished with exit code $status (details: logs/fill-job-text/<date>.txt in the private repo)."
           exit $status

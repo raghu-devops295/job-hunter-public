@@ -61,5 +61,5 @@ jobs:
           [[ "$ISSUE" =~ ^[0-9]+$ ]] || { echo "Issue must be a number"; exit 1; }
           python tailor.py --issue "$ISSUE" > tailor-output.txt 2>&1; status=$?
           python tools/save_log.py tailor-output.txt tailor
-          echo "Tailor finished with exit code $status (details: logs/last-tailor.txt in the private repo)."
+          echo "Tailor finished with exit code $status (details: logs/tailor/<date>.txt in the private repo)."
           exit $status

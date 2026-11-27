@@ -42,5 +42,5 @@ jobs:
           set +e
           python tools/add_outreach.py > out.txt 2>&1; status=$?
           python tools/save_log.py out.txt add-outreach
-          echo "Finished with exit code $status (details: logs/last-add-outreach.txt in the private repo)."
+          echo "Finished with exit code $status (details: logs/add-outreach/<date>.txt in the private repo)."
           exit $status

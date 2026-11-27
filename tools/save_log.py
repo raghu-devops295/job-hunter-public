@@ -1,4 +1,4 @@
-"""Save a run's full log in the PRIVATE data repo (logs/last-<name>.txt) instead of the public run page.
+"""Save a run's full log in the PRIVATE data repo (logs/<name>/<YYYY-MM-DD>.txt) instead of the public run page.
 
     python tools/save_log.py run-output.txt job-hunter
 
@@ -9,6 +9,7 @@ Needs DATA_REPO (owner/name) and GITHUB_TOKEN (a token that can write to it).
 import base64
 import os
 import sys
+from datetime import datetime, timezone
 
 import requests
 
@@ -20,7 +21,7 @@ def main(log_file: str, name: str) -> None:
     if not repo or not token or not os.path.exists(log_file):
         print("Log not saved (no DATA_REPO, token or log file).")
         return
-    path = f"logs/last-{name}.txt"
+    path = f"logs/{name}/{datetime.now(timezone.utc):%Y-%m-%d}.txt"   # one file per day (a re-run that day replaces it)
     headers = {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
     old = requests.get(f"{API}/repos/{repo}/contents/{path}", headers=headers, timeout=30)
     body = {"message": f"Log of the {name} run",

@@ -52,7 +52,7 @@ This repo is public so GitHub Actions runs here are free. Everything personal st
 | `jobhunter/resume.yaml`, `jobhunter/facts.md` | code, workflows, company lists, example files |
 | job issues (the tracker) and labels | the daily run, tailoring, fill-job-text |
 | tailored PDFs in `resumes/` | robot memory (Actions cache) |
-| full run logs in `logs/last-*.txt` | only a one-line status per run |
+| full run logs in `logs/<workflow>/<date>.txt` | only a one-line status per run |
 | `Relay` workflow: the `tailor` / `needs-text` labels start the workflows here | |
 
 Setup: a fine-grained token with **Contents, Issues and Actions: read and write** on both repos, saved as the secret

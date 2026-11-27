@@ -37,5 +37,5 @@ jobs:
           set +e
           python -m jobhunter.india.india_hunter > out.txt 2>&1; status=$?
           python tools/save_log.py out.txt india-hunter
-          echo "Finished with exit code $status (details: logs/last-india-hunter.txt in the private repo)."
+          echo "Finished with exit code $status (details: logs/india-hunter/<date>.txt in the private repo)."
           exit $status

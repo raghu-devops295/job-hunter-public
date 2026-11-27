@@ -14,7 +14,7 @@ on:
 
 # This repo is PUBLIC (free Actions minutes). Your resume, facts, job issues and tailored PDFs live in the
 # PRIVATE repo below; the DATA_REPO_TOKEN secret gives this workflow access to it. Full logs are saved
-# there too (logs/last-*.txt), so the public run page shows only a status line.
+# there too (logs/<workflow>/<date>.txt), so the public run page shows only a status line.
 env:
   DATA_REPO: raghu-devops295/job-hunter
 
@@ -72,7 +72,7 @@ jobs:
           set +e
           python run.py > run-output.txt 2>&1; status=$?
           python tools/save_log.py run-output.txt job-hunter
-          echo "Robot finished with exit code $status (details: logs/last-job-hunter.txt in the private repo)."
+          echo "Robot finished with exit code $status (details: logs/job-hunter/<date>.txt in the private repo)."
           exit $status
 
       # LinkedIn job -> company's own careers site: save it and let "Find companies" detect its hiring
