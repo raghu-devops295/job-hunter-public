@@ -68,3 +68,21 @@ def test_save_linkedin_careers_pages(tmp_path, monkeypatch):
     run.save_linkedin_careers_pages(kept)
     lines = (tmp_path / "lists" / "linkedin_careers_urls.txt").read_text().splitlines()
     assert lines[1:] == ["job-boards.greenhouse.io/acme/jobs/2"]
+
+
+def test_thehub_reads_list_and_detail(monkeypatch):
+    from jobhunter.sources import more_boards as m
+    monkeypatch.setattr("jobhunter.scoring.TARGET_COUNTRIES", ["Denmark"])
+    def fake(url, params=None, headers=None):
+        if url.endswith("jobsandfeatured"):
+            if params["search"] != "devops":
+                return {"jobs": {"docs": [], "pages": 1}}
+            return {"jobs": {"pages": 1, "docs": [{"id": "abc", "title": "Senior DevOps Engineer", "isRemote": False,
+                     "location": {"locality": "Herlev", "country": "Denmark"}, "company": {"name": "Flatpay"}}]}}
+        return {"doc": {"description": "<p>Azure and AKS</p>", "publishedAt": "2026-11-20T07:00:00Z",
+                        "link": "https://jobs.flatpay.com/jobs/1"}}
+    monkeypatch.setattr(m, "get_json", fake)
+    jobs = m.thehub()
+    assert len(jobs) == 1 and jobs[0]["company"] == "Flatpay" and jobs[0]["location"] == "Herlev, Denmark"
+    assert jobs[0]["url"] == "https://jobs.flatpay.com/jobs/1" and "AKS" in jobs[0]["description"]
+    assert jobs[0]["posted_at"].startswith("2026-11-20")

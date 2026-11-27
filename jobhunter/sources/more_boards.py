@@ -226,6 +226,14 @@ def thehub() -> list[dict]:
                                      where, f"https://thehub.io/jobs/{j.get('id')}", "", None, bool(j.get("isRemote"))))
                 if page >= (block.get("pages") or 1):
                     break
+    # The list has no ad text: read the full ad for engineering titles only (max 60 extra calls).
+    # Also use the employer's own application link when The Hub has one (you prefer applying there).
+    for job in [j for j in jobs if re.search(DEVOPS_WORDS + r"|engineer", j["title"].lower())][:60]:
+        doc = (get_json(f"https://thehub.io/api/jobs/{job['id'].split(':', 1)[1]}") or {}).get("doc") or {}
+        job["description"] = strip_html(doc.get("description") or "")[:8000]
+        job["posted_at"] = doc.get("publishedAt") or doc.get("createdAt")
+        if doc.get("link"):
+            job["thehub_url"], job["url"] = job["url"], doc["link"]
     return jobs
 
 
