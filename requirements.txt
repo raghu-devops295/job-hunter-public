@@ -1,0 +1,7 @@
+# Libraries (ready-made code) our project needs.
+# Install them with:  py -m pip install -r requirements.txt
+requests>=2.31   # lets Python talk to websites and APIs
+pyyaml>=6.0      # reads resume.yaml
+reportlab>=4.0   # writes the tailored resume PDF
+python-docx
+pypdf>=4.0      # reads the tailored PDF back, to check what an ATS parser sees

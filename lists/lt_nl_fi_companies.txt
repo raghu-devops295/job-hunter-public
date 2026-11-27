@@ -1,0 +1,221 @@
+# Tech employers in Lithuania, the Netherlands and Finland that hire in English (added Nov 2026).
+# One company per line; tools/find_companies.py tries each on the 10 hiring systems.
+# --- Lithuania (Vilnius / Kaunas)
+Vinted
+Nord Security
+nordsec
+CAST AI
+castai
+Oxylabs
+Hostinger
+Kilo Health
+Tesonet
+Omnisend
+TransferGo
+Paysera
+Eneba
+Wargaming
+Wix
+Adform
+Bored Panda
+Telesoftas
+Baltic Amadeus
+Visma Lietuva
+Ignitis
+Luminor
+Swedbank
+SEB
+Danske Bank
+Telia
+Tele2
+Mediapark
+Zenitech
+Devbridge
+Interactive Brokers
+Revolut
+Surfshark
+Kevin
+Genie
+Carvertical
+Lightyear
+Bolt
+PVcase
+Exacaster
+Dr. Max
+Euroapotheca
+Teltonika
+Sneakers
+Billo
+Ondato
+iDenfy
+# --- Netherlands
+Mollie
+bunq
+Picnic
+bol.com
+bol
+Coolblue
+Miro
+Bird
+MessageBird
+Catawiki
+TomTom
+Sendcloud
+WeTransfer
+Backbase
+Mendix
+Bynder
+Framer
+Channable
+Tiqets
+Ohpen
+Ortec
+Nmbrs
+Yource
+Elastic
+Databricks
+Uber
+Booking
+Adyen
+ABN AMRO
+Rabobank
+ING
+Ahold Delhaize
+Just Eat Takeaway
+Takeaway
+Philips
+ASML
+NXP
+KPN
+Vodafone Ziggo
+VodafoneZiggo
+Eneco
+Vattenfall
+Alliander
+Stedin
+Tennet
+PostNL
+NS
+Schiphol
+KLM
+Randstad
+Wolters Kluwer
+Exact
+AFAS
+Topicus
+Visma Idella
+Ortec
+Optiver
+IMC
+Flow Traders
+Da Vinci
+Maven Securities
+All Options
+Booking.com
+Lightspeed
+Personio
+Payvision
+Ebay Classifieds
+Marktplaats
+Adevinta
+DPG Media
+Mollie
+Cloudsmith
+Elastic
+Gitlab
+Snyk
+Hypersolid
+Funda
+Tikkie
+Sligro
+Voi
+Felyx
+Swapfiets
+Fastned
+Lepaya
+Studocu
+Effectory
+Squla
+Leaseweb
+Bit.nl
+Hostnet
+TransIP
+# --- Finland
+Wolt
+Supercell
+Rovio
+Relex
+Aiven
+Varjo
+IQM
+Oura
+Elisa
+OP Financial Group
+Futurice
+Reaktor
+Solita
+Vincit
+Nitor
+Siili
+Gofore
+Fortum
+Neste
+UPM
+Fiskars
+Sanoma
+Alma Media
+ICEYE
+Swappie
+Veikkaus
+Posti
+Remedy Entertainment
+Housemarque
+Metacore
+Small Giant Games
+Holvi
+Enfuce
+Aktia
+Smartly
+Unity
+Zalando Helsinki
+Visma Finland
+Tietoevry
+CGI Finland
+Kesko
+S Group
+Nordea
+AlphaSense
+Frends
+Distance Technologies
+Forward Forever
+CUJO AI
+Smartum
+Yousician
+MariaDB
+Vaisala
+Valmet
+Konecranes
+Kone
+Ponsse
+Wärtsilä
+Polar Electro
+Huawei Finland
+Nokia
+Ericsson Finland
+Mirka
+Taxfix
+Silo AI
+Kaiko Games
+Seriously
+Next Games
+Tuxera
+SSH Communications
+F-Secure
+WithSecure
+Hiotlabs
+Kaltiot
+Sievo
+Efecte
+Basware
+Qvantel
+Uniqmind

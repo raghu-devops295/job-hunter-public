@@ -1,0 +1,65 @@
+# One button: finds which hiring system ~90 European companies use and saves them in companies.py.
+# Actions -> Find companies -> Run workflow. Run it once, then again whenever you add names.
+
+name: Find companies
+
+on:
+  workflow_dispatch:
+  push:                    # run right after the morning digest adds names/careers URLs from job alerts
+    branches: [main]
+    paths:
+      - "lists/*_companies.txt"
+      - "lists/*_careers_urls.txt"
+  schedule:
+    - cron: "23 0 * * 1"   # Mondays 05:53 India time: re-check all companies (cut from daily to save Actions minutes)
+
+concurrency:
+  group: find-companies
+  cancel-in-progress: false
+
+permissions:
+  contents: write    # allowed to save the updated companies.py back to the repo
+
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Get the companies the last scan found on job boards (data/scan_companies.txt)
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: jobhunter-data-none
+          restore-keys: jobhunter-data-
+
+      - name: Find companies and add them
+        run: python tools/find_companies.py --write | tee found.txt
+
+      - name: Detect hiring systems behind careers pages (lists/*_careers_urls.txt)
+        run: python tools/detect_ats.py --write | tee -a found.txt
+
+      - name: Save the result to the repo
+        run: |
+          git config user.name "job-hunter bot"
+          git config user.email "job-hunter-bot@users.noreply.github.com"
+          git add jobhunter/companies.py
+          git diff --cached --quiet && echo "Nothing new found." && exit 0
+          git commit -m "Add companies found by the Find companies workflow"
+          for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done
+
+      - name: Show results on the run page
+        if: always()
+        run: |
+          echo '## Companies found' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat found.txt >> "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

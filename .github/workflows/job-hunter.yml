@@ -1,0 +1,111 @@
+# GitHub Actions = a free computer in GitHub's cloud that runs your robot on a schedule.
+# (Same idea as an Azure DevOps / GitLab CI pipeline with a scheduled trigger.)
+
+name: Job hunter
+
+on:
+  schedule:
+    - cron: "17 1 * * *"   # 1x a day (UTC) = 06:47 India time (cut from 2x to save Actions minutes; manual "Run workflow" still works)
+  workflow_dispatch:                # adds a "Run workflow" button for manual runs
+    inputs:
+      days:
+        description: "Only jobs posted in the last N days (Greenhouse has no post date, so its jobs are always checked)"
+        default: "14"
+
+# This repo is PUBLIC (free Actions minutes). Your resume, facts, job issues and tailored PDFs live in the
+# PRIVATE repo below; the DATA_REPO_TOKEN secret gives this workflow access to it. Full logs are saved
+# there too (logs/last-*.txt), so the public run page shows only a status line.
+env:
+  DATA_REPO: raghu-devops295/job-hunter
+
+permissions:
+  contents: write    # save company careers pages in lists/ (public, no personal data)
+  actions: write     # start the "Find companies" workflow when LinkedIn showed new company careers pages
+
+concurrency:
+  group: job-hunter  # never run two at the same time
+  cancel-in-progress: false
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Get your private data (resume, facts)
+        uses: ./.github/actions/private-data
+        with:
+          repo: ${{ env.DATA_REPO }}
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install libraries
+        run: pip install -r requirements.txt
+
+      # The robot's memory (seen jobs + Gemini answers) lives in data/.
+      # The cache carries it from one run to the next, without ever committing it to the repo.
+      - name: Restore robot memory
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: jobhunter-data-${{ github.run_id }}
+          restore-keys: jobhunter-data-
+
+      - name: Run the job hunter
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # stored in repo Settings -> Secrets
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}       # optional fallback when Gemini is busy
+          GITHUB_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}    # creates the job issues in the private repo
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}         # optional: LinkedIn jobs via Apify (empty = skipped)
+          APIFY_COUNTRIES: ${{ vars.APIFY_COUNTRIES }}    # optional repo variables; empty = all of lists/countries.txt
+          PYTHONUNBUFFERED: "1"
+          MAX_AGE_DAYS: ${{ inputs.days || '14' }}         # manual runs can ask for e.g. 1 day
+        run: |
+          set +e
+          python run.py > run-output.txt 2>&1; status=$?
+          python tools/save_log.py run-output.txt job-hunter
+          echo "Robot finished with exit code $status (details: logs/last-job-hunter.txt in the private repo)."
+          exit $status
+
+      # LinkedIn job -> company's own careers site: save it and let "Find companies" detect its hiring
+      # system, so from tomorrow the robot scans that company's whole careers site for matching roles.
+      - name: Save new company careers pages from LinkedIn
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add lists/linkedin_careers_urls.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "No new careers pages."; exit 0; fi
+          git config user.name "job-hunter bot"
+          git config user.email "job-hunter-bot@users.noreply.github.com"
+          git commit -q -m "Add company careers pages seen on LinkedIn"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
+          gh workflow run find-companies.yml --ref main && echo "Started Find companies."
+
+      - name: Tailor resumes for new strong matches
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}       # optional fallback when Gemini is busy
+          GITHUB_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}    # PDFs are saved in the private repo's resumes/
+          PYTHONUNBUFFERED: "1"
+        run: |
+          rm -f data/auto_tailor.done
+          if [ -f data/google_busy ]; then
+            echo "Gemini was busy - tailoring skipped. Add the label 'tailor' to an issue later."
+            exit 0
+          fi
+          : > tailor-output.txt
+          for n in $(cat data/auto_tailor.txt 2>/dev/null); do
+            echo "=== tailoring issue #$n" >> tailor-output.txt
+            python tailor.py --issue "$n" >> tailor-output.txt 2>&1 || echo "  (could not tailor #$n)" >> tailor-output.txt
+          done
+          echo "Tailored $(grep -c '^=== tailoring' tailor-output.txt) issue(s)."
+          python tools/save_log.py tailor-output.txt auto-tailor
+          : > data/auto_tailor.txt

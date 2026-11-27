@@ -1,0 +1,62 @@
+# Jobs added without the full ad text get the label `needs-text` in the private repo. Its "Relay"
+# workflow starts this one; it opens the job page, stores the text inside the issue and tailors the resume.
+
+name: Fill job text
+
+on:
+  schedule:
+    - cron: "47 3 * * *"      # daily safety net (09:17 India time) for anything missed
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: "Issue number in the private repo (empty = all issues labelled needs-text)"
+        required: false
+
+env:
+  DATA_REPO: raghu-devops295/job-hunter
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fill-job-text
+  cancel-in-progress: false
+
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get your private data (resume, facts)
+        uses: ./.github/actions/private-data
+        with:
+          repo: ${{ env.DATA_REPO }}
+          token: ${{ secrets.DATA_REPO_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Fetch the job ad text into the issue, then tailor
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
+          ISSUE: ${{ inputs.issue }}
+        run: |
+          set +e
+          if [ -n "$ISSUE" ]; then
+            [[ "$ISSUE" =~ ^[0-9]+$ ]] || { echo "Issue must be a number"; exit 1; }
+            python tools/fill_job_text.py --issue "$ISSUE" > fill-output.txt 2>&1
+          else
+            python tools/fill_job_text.py > fill-output.txt 2>&1
+          fi
+          status=$?
+          for n in $(cat data/filled.txt 2>/dev/null); do
+            echo "=== tailoring issue #$n" >> fill-output.txt
+            python tailor.py --issue "$n" >> fill-output.txt 2>&1 || echo "  (could not tailor #$n)" >> fill-output.txt
+          done
+          python tools/save_log.py fill-output.txt fill-job-text
+          echo "Finished with exit code $status (details: logs/last-fill-job-text.txt in the private repo)."
+          exit $status

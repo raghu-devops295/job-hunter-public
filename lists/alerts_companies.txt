@@ -1,0 +1,259 @@
+# Companies seen in job-alert emails (added by the morning digest). One per line.
+61N
+Flossbach von Storch
+Pradtke
+OpenText
+Baden-Württembergische Bank
+TP Aerospace
+ecosio
+MIC Customs Solutions
+BIOTRONIK
+HDI
+MRH Trowe
+Majori
+Bundesnotarkammer
+Vodafone
+Trellix
+Hoffmann Group
+Meierhofer
+Dustin
+Integral Group
+Lumenaza
+N26
+Enpal
+Apple
+Smart Working Solutions
+CHAPTERS Group
+Toll Collect
+become.1
+EDEKABANK
+Deutsche Bank
+Allguth
+Lürssen
+YachtCloud
+BNG Bank
+EFOR
+TNS
+Susquehanna
+Ubique Systems
+Sogeti
+Commerzbank
+Sii
+Luxoft
+Nordiska
+BESTSELLER
+Skatteguiden
+RIB Software
+Digia
+Isar Aerospace
+Ignite
+InterSystems
+Accenture
+Thales
+Global Automotive Group
+UAB-Online
+CYSO
+Inetum
+Mastercard
+Hyra
+CGI
+Integral
+Workday
+VERDA
+Huhtamaki
+New Monday
+CinePostproduction
+Deutsche Börse
+U.S. Bank
+Acuity Analytics
+PFH Technology Group
+Version 1
+Trust In SODA
+Sprinklr
+SITA
+Berenberg
+Redcare Pharmacy
+KD Pharma
+GUS Group
+R+V Versicherung
+Modaxo
+PRODYNA
+Danske Commodities
+Redpill Linpro
+Energinet
+Sectra
+Terma
+ID-ware
+Solvinity
+Lunar
+IMC Trading
+Nordic Transport Group
+OBI Group Holding
+Rohde & Schwarz
+TaskVerse
+Cognism
+Skywaves Rise
+TEAM International
+Software Mind
+Sii Poland
+Sur Global
+Vertex Agility
+YorTeam
+Digital Green
+SozialBank
+Soley
+PCS Systemtechnik
+MongoDB
+5V Tech
+BoyleSports
+Studytube
+Twoday
+Adyen
+Robin Radar Systems
+Basic-Fit
+machineering
+Springer Nature
+Skaylink
+Deutsche Bahn
+ablefy
+Attio
+Avanade
+M&M Software
+S-Management Services
+Microsoft
+Futurice
+ARX Robotics
+GE Vernova
+Upvest
+SumUp
+Doctolib
+Allianz Partners
+Yorizon Cloud
+Talon.One
+XALT Business Consulting
+CONET Technologies
+UniProfs Services
+Tiqets
+SQUER
+welevel
+Controlware
+ABOUT YOU
+AGNTX
+The Citco Group
+Optum
+Newpage Solutions
+dexi.io
+Dalux
+AMETEK
+HCLTech
+Tata Consultancy Services
+SOFTSWISS
+CellPoint Digital
+Dotmatics
+ZABEL
+Lio
+Entelios
+Aimo
+Akamai Technologies
+Insight International
+Sia
+ALMETRA
+Immersive Infotech
+Info Support
+Infor
+Capgemini Engineering
+BearingPoint
+ACI Worldwide
+RapidRatings
+SCAYLE
+Materna
+Sustaind
+STARK Group
+N-iX
+Veo Technologies
+the LEGO Group
+EY
+Focal Systems
+Trackman
+RepRisk
+Lampenwelt GmbH
+IP Dynamics GmbH
+AOE
+Renesas Electronics
+Onde
+ITELENCE
+ThreatFabric
+Pepper Advantage
+n_value group
+ALDB GmbH
+novomind AG
+ETFBOOK
+Jacobs
+Atos
+ABN AMRO
+Logius
+9altitudes Netherlands
+Poppulo
+Albany Beck
+Egmont
+Nordea
+Hiab
+trawa (Future Energy Services GmbH)
+HiSolutions AG
+Aras Corporation
+PEPLY.ai
+N Consulting Global
+Tabby
+Concat AG
+TIMOCOM
+iVentureGroup
+DACHS IT GmbH
+Inviso
+Sund & Bælt
+Deployteq
+Ambu
+Pandora
+OANDA
+Svitla Systems
+McKesson
+Ministry Brands
+Real Garant by Zurich
+TÜV NORD GROUP
+Intetics
+Mammoet
+Vestas
+Nagarro
+Lottomerkury
+Camlin Group
+Bechtle
+Eficode
+Guidewire Software
+Henry Schein
+Vox Talk AI
+Meyn Food Processing Technology
+Monolithic Power Systems
+Giesecke+Devrient
+IVO Rechtspraak
+Sioux Technologies
+Booking.com
+constellr
+Frontiers
+Deloitte
+Sumary
+NetApp
+Betty Blocks
+SoftwareOne
+Lincsafe
+Overstory
+Danske Bank
+plusserver
+St1
+Arla Foods
+DZ HYP
+Wypoon Technologies
+Jabil
+Thinkport GmbH
+MegaPart GmbH
+deepset GmbH
+Zscaler
+Too Good To Go

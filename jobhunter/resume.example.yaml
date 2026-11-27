@@ -1,0 +1,50 @@
+# EXAMPLE master resume (a made-up person). The real one is jobhunter/resume.yaml, kept in the private
+# data repo and copied in by the workflows. The tailor may only REORDER and REWORD these bullets.
+
+settings:
+  show_terraform: true
+
+contact:                        # used only when printing the PDF - never sent to the AI
+  name: ALEX EXAMPLE
+  line1: "Example City, Country | +00 000 000 000 | alex@example.com | linkedin.com/in/example"
+
+allowed_titles:
+  - Senior Platform Engineer
+  - Senior DevOps Engineer
+  - Senior Cloud Engineer (Azure)
+
+summary_facts: >
+  Platform engineer who runs shared Azure Kubernetes platforms for several internal applications.
+  Builds CI/CD pipelines and monitoring, and automates routine operations.
+
+skills:
+  Cloud & Platform: [Microsoft Azure, Azure Kubernetes Service (AKS)]
+  CI/CD: [Azure DevOps, GitLab CI/CD]
+  Monitoring: [Prometheus, Grafana, Azure Monitor]
+
+terraform_skill: "Terraform"
+
+experience:
+  - id: current
+    title: Platform Engineer
+    org: Example Bank | Example City
+    dates: 01/2022 – Present
+    bullets:
+      c1: Run 3 shared AKS clusters used by 10 internal applications.
+      c2: Built reusable CI/CD pipeline templates in Azure DevOps.
+      c3: Set up Prometheus and Grafana dashboards and alerts for the platform.
+  - id: previous
+    title: DevOps Engineer
+    org: Example Consulting | Example City
+    dates: 01/2018 – 12/2021
+    bullets:
+      p1: Moved 5 applications from virtual machines to containers.
+      p2: Automated environment builds with scripts and pipelines.
+
+education:
+  - "<b>B.Sc, Information Technology</b>, Example University  |  2014 – 2017"
+
+certifications:
+  - Microsoft Certified - Azure Fundamentals (AZ-900)
+
+languages: "English (fluent)"

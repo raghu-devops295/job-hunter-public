@@ -1,0 +1,26 @@
+# Copies your personal files (resume.yaml, facts.md) from the PRIVATE data repo into this checkout.
+# They exist only on the runner for this run and are never committed here.
+name: Get private data
+description: Copy resume.yaml and facts.md from the private data repo
+inputs:
+  token:
+    description: Fine-grained token with access to the private data repo
+    required: true
+  repo:
+    description: owner/name of the private data repo
+    required: true
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.repo }}
+        token: ${{ inputs.token }}
+        path: private
+        sparse-checkout: |
+          jobhunter/resume.yaml
+          jobhunter/facts.md
+        sparse-checkout-cone-mode: false
+        persist-credentials: false
+    - shell: bash
+      run: cp private/jobhunter/resume.yaml private/jobhunter/facts.md jobhunter/ && rm -rf private

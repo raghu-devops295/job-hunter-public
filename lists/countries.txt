@@ -1,0 +1,13 @@
+# Target countries for the WHOLE job-hunter setup (code + scheduled tasks read this file).
+# One country per line, best first. The first line gets extra ranking points.
+# Change a country here and nothing else: scoring, filters and the Claude tasks all follow it.
+Netherlands
+Germany
+Ireland
+Denmark
+Finland
+Sweden
+Luxembourg
+Spain
+Estonia
+Lithuania

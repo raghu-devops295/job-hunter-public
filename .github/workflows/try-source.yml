@@ -1,0 +1,26 @@
+# Developer helper: run a short Python snippet against the job sources (to test a new hiring-system reader).
+# Actions -> Try source -> Run workflow -> paste the code. Only people with write access can run it.
+name: Try source
+
+on:
+  workflow_dispatch:
+    inputs:
+      code:
+        description: "Python code to run (jobhunter is importable)"
+        required: true
+
+jobs:
+  try:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run
+        env:
+          CODE: ${{ inputs.code }}
+        run: python -c "$CODE"
