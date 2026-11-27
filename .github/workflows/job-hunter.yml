@@ -44,6 +44,12 @@ jobs:
       PYTHONUTF8: "1"        # Windows: read/write files as UTF-8 (job ads contain umlauts, dashes...)
 
     steps:
+      # Windows PC: let "shell: bash" find Git Bash (Windows has no bash on PATH by default).
+      - name: Use Git Bash (PC only)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: Add-Content -Path $env:GITHUB_PATH -Value 'C:\Program Files\Git\bin'
+
       - name: Get the code
         uses: actions/checkout@v4
 
