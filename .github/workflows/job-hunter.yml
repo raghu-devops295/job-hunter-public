@@ -11,6 +11,11 @@ on:
       days:
         description: "Only jobs posted in the last N days (Greenhouse has no post date, so its jobs are always checked)"
         default: "14"
+      where:
+        description: "Where to run. my-pc = your Windows PC (needed for Workday, which blocks GitHub). Start the runner on the PC first."
+        type: choice
+        options: [github, my-pc]
+        default: github
 
 # This repo is PUBLIC (free Actions minutes). Your resume, facts, job issues and tailored PDFs live in the
 # PRIVATE repo below; the DATA_REPO_TOKEN secret gives this workflow access to it. Full logs are saved
@@ -28,8 +33,15 @@ concurrency:
 
 jobs:
   hunt:
-    runs-on: ubuntu-latest
+    # Scheduled runs: GitHub's cloud. Manual run with where=my-pc: the self-hosted runner on your PC
+    # (labels self-hosted + job-hunter-pc). Workday blocks GitHub's IPs, so only PC runs get Workday jobs.
+    runs-on: ${{ inputs.where == 'my-pc' && fromJSON('["self-hosted", "job-hunter-pc"]') || 'ubuntu-latest' }}
     timeout-minutes: 55
+    defaults:
+      run:
+        shell: bash          # on Windows this is Git Bash (comes with Git for Windows)
+    env:
+      PYTHONUTF8: "1"        # Windows: read/write files as UTF-8 (job ads contain umlauts, dashes...)
 
     steps:
       - name: Get the code
@@ -42,13 +54,19 @@ jobs:
           token: ${{ secrets.DATA_REPO_TOKEN }}
 
       - name: Set up Python
+        if: runner.environment == 'github-hosted'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
 
+      # On your PC the Python you installed is used (3.10 or newer); setup-python would need admin rights.
+      - name: Check Python on your PC
+        if: runner.environment == 'self-hosted'
+        run: python -c "import sys; print(sys.version); assert sys.version_info >= (3, 10), 'Install Python 3.10+ from python.org (tick Add to PATH)'"
+
       - name: Install libraries
-        run: pip install -r requirements.txt
+        run: python -m pip install -q -r requirements.txt
 
       # The robot's memory (seen jobs + Gemini answers) lives in data/.
       # The cache carries it from one run to the next, without ever committing it to the repo.
@@ -58,6 +76,7 @@ jobs:
           path: data
           key: jobhunter-data-${{ github.run_id }}
           restore-keys: jobhunter-data-
+          enableCrossOsArchive: true   # the same memory for GitHub (Linux) and PC (Windows) runs
 
       - name: Run the job hunter
         env:
