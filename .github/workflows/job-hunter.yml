@@ -65,6 +65,7 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}       # optional fallback when Gemini is busy
           GITHUB_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}    # creates the job issues in the private repo
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}         # optional: LinkedIn jobs via Apify (empty = skipped)
+          WORKDAY_PROXY: ${{ secrets.WORKDAY_PROXY }}     # optional: Workday blocks GitHub IPs (HTTP 429); http://user:pass@host:port
           APIFY_COUNTRIES: ${{ vars.APIFY_COUNTRIES }}    # optional repo variables; empty = all of lists/countries.txt
           PYTHONUNBUFFERED: "1"
           MAX_AGE_DAYS: ${{ inputs.days || '14' }}         # manual runs can ask for e.g. 1 day

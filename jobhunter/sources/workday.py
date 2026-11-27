@@ -8,9 +8,16 @@ The list gives title, location and "Posted 3 Days Ago"; the description is fetch
 
 Add a company: open its careers page, copy <tenant>, <wdN> and <site> from the URL, e.g.
     https://kyndryl.wd5.myworkdayjobs.com/en-US/KyndrylProfessionalCareers  ->  ("kyndryl", "wd5", "KyndrylProfessionalCareers")
-Sites that don't answer are listed at the end of the run so you can delete them.
+Sites that don't exist (404) are listed at the end of the run so you can delete them.
+
+BLOCKED (since 16 Nov 2026): Workday's Cloudflare answers HTTP 429 to every request from GitHub's
+servers (Azure IPs), with any User-Agent and also after waiting. That is not a dead site, so blocked
+sites are reported separately and never as "not found". To get Workday jobs again, send the requests
+through another IP: set the secret WORKDAY_PROXY (e.g. http://user:pass@host:port) or run the
+job hunter on a self-hosted runner (your own PC).
 """
 
+import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
@@ -21,6 +28,17 @@ from jobhunter.sources.common import HEADERS, strip_html
 
 SEARCHES = ["devops", "platform engineer", "cloud engineer", "site reliability", "azure", "kubernetes"]
 PAGES_PER_SEARCH = 2          # 20 jobs per page
+NOT_FOUND = (400, 404, 410, 422)   # unknown tenant / site
+BLOCKED = (403, 429)               # Cloudflare refuses this IP
+
+_proxy = os.environ.get("WORKDAY_PROXY", "").strip()
+PROXIES = {"http": _proxy, "https": _proxy} if _proxy else None
+
+blocked: list[str] = []            # filled by fetch_all: "tenant (HTTP 429)" - shown in the run log
+
+
+class Blocked(Exception):
+    pass
 
 
 def _base(tenant, wd):
@@ -49,9 +67,14 @@ def fetch_company(tenant: str, wd: str, site: str) -> list[dict] | None:
     for term in SEARCHES:
         for page in range(PAGES_PER_SEARCH):
             r = requests.post(url, json={"appliedFacets": {}, "limit": 20, "offset": page * 20, "searchText": term},
-                              headers={**HEADERS, "Accept": "application/json"}, timeout=30)
-            if r.status_code in (400, 403, 404, 422, 500):
-                return None if not jobs and term == SEARCHES[0] and page == 0 else jobs
+                              headers={**HEADERS, "Accept": "application/json"}, proxies=PROXIES, timeout=30)
+            first = not jobs and term == SEARCHES[0] and page == 0
+            if r.status_code in BLOCKED:
+                if first:
+                    raise Blocked(f"HTTP {r.status_code}")
+                return jobs              # blocked half-way: keep what we have
+            if r.status_code in NOT_FOUND:
+                return None if first else jobs
             r.raise_for_status()
             postings = r.json().get("jobPostings") or []
             for p in postings:
@@ -72,7 +95,7 @@ def fetch_company(tenant: str, wd: str, site: str) -> list[dict] | None:
 
 def add_description(job: dict) -> None:
     """Fetch full description + exact location for one job (called only for title-gate survivors)."""
-    r = requests.get(job["wd_ref"], headers={**HEADERS, "Accept": "application/json"}, timeout=30)
+    r = requests.get(job["wd_ref"], headers={**HEADERS, "Accept": "application/json"}, proxies=PROXIES, timeout=30)
     r.raise_for_status()
     info = r.json().get("jobPostingInfo") or {}
     job["description"] = strip_html(info.get("jobDescription") or "")
@@ -93,17 +116,32 @@ def add_description(job: dict) -> None:
 
 
 def fetch_all(sites: list[tuple[str, str, str]]) -> tuple[list[dict], list[str]]:
+    """Returns (jobs, not_found). not_found = only sites that really don't exist (404 etc.).
+    Sites that refused us (429/403) or errored go to the module list `blocked` instead."""
     jobs, not_found = [], []
+    blocked.clear()
 
     def one(site):
         try:
-            return site, fetch_company(*site)
-        except Exception:
-            return site, None
+            return site, fetch_company(*site), None
+        except Blocked as e:
+            return site, None, str(e)
+        except Exception as e:           # timeout, 5xx, bad JSON...
+            return site, None, f"{type(e).__name__}: {str(e)[:80]}"
 
-    with ThreadPoolExecutor(max_workers=6) as pool:
-        for site, found in pool.map(one, sites):
-            if found is None:
+    # Probe one site first: if Workday blocks this IP, all sites are blocked - don't hammer 66 of them.
+    if sites:
+        site, found, err = one(sites[0])
+        if err and err.startswith("HTTP 4"):
+            blocked.extend(f"{s[0]} ({err})" for s in sites)
+            return jobs, not_found
+        results = [(site, found, err)]
+        with ThreadPoolExecutor(max_workers=6) as pool:
+            results += list(pool.map(one, sites[1:]))
+        for site, found, err in results:
+            if err:
+                blocked.append(f"{site[0]} ({err})")
+            elif found is None:
                 not_found.append(site[0])
             else:
                 jobs += found
