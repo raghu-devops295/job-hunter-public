@@ -115,7 +115,8 @@ def fetch_all() -> list[dict]:
     # (name, function, the ONE country the board covers - None = many countries). Boards for a country that is
     # not in lists/countries.txt are not called at all: their jobs would all be filtered out anyway.
     boards = (("CVonline.lt + CV.ee", cvonline, None), ("Jobly.fi", jobly, "Finland"), ("Magnet.me", magnetme, "Netherlands"),
-              ("Jobindex.dk", jobindex, "Denmark"), ("relocate.me", relocateme, None), ("NoFluffJobs", nofluffjobs, "Poland"),
+              ("Jobindex.dk", jobindex, "Denmark"), ("IT-jobbank.dk", itjobbank, "Denmark"), ("The Hub", thehub, None),
+              ("relocate.me", relocateme, None), ("NoFluffJobs", nofluffjobs, "Poland"),
               ("JustJoin.it", justjoin, "Poland"), ("WeWorkRemotely", weworkremotely, None), ("Working Nomads", workingnomads, None))
     for name, fn, country in boards:
         if country and country not in TARGET_COUNTRIES:
@@ -166,10 +167,11 @@ def add_relocateme_description(job: dict) -> None:
 JOBINDEX_SEARCHES = ["devops", "platform engineer", "site reliability engineer", "azure", "kubernetes", "cloud engineer"]
 
 
-def jobindex() -> list[dict]:
+def _jobindex_rss(base: str, source: str) -> list[dict]:
+    """Jobindex and IT-jobbank (same company, same RSS format): one feed per search word."""
     jobs, seen = [], set()
     for term in JOBINDEX_SEARCHES:
-        r = requests.get("https://www.jobindex.dk/jobsoegning.rss", params={"q": term}, headers=HEADERS, timeout=30)
+        r = requests.get(f"{base}/jobsoegning.rss", params={"q": term}, headers=HEADERS, timeout=30)
         r.raise_for_status()
         for item in ET.fromstring(r.content).iter("item"):
             text = lambda tag: (item.findtext(tag) or "").strip()
@@ -182,8 +184,56 @@ def jobindex() -> list[dict]:
                 posted = parsedate_to_datetime(text("pubDate")).isoformat()
             except (TypeError, ValueError):
                 posted = None
-            jobs.append(_job("jobindex", link.rstrip("/").split("/")[-1], title or text("title"), company,
+            jobs.append(_job(source, link.rstrip("/").split("/")[-1], title or text("title"), company,
                              "Denmark", link, text("description"), posted))
+    return jobs
+
+
+def jobindex() -> list[dict]:
+    return _jobindex_rss("https://www.jobindex.dk", "jobindex")
+
+
+def itjobbank() -> list[dict]:
+    """Computerworld IT-jobbank.dk - Denmark's IT-only job board (part of Jobindex, but many ads only here)."""
+    return _jobindex_rss("https://www.it-jobbank.dk", "itjobbank")
+
+
+# ---------------- The Hub (thehub.io) - Nordic startup / scale-up jobs - public JSON API ----------------
+THEHUB_COUNTRIES = {"Denmark": "DK", "Sweden": "SE", "Finland": "FI"}
+THEHUB_SEARCHES = ["devops", "platform engineer", "site reliability", "azure", "kubernetes", "cloud engineer"]
+
+
+def thehub() -> list[dict]:
+    from jobhunter.scoring import TARGET_COUNTRIES
+    jobs, seen = [], set()
+    for country, code in THEHUB_COUNTRIES.items():
+        if country not in TARGET_COUNTRIES:
+            continue
+        for term in THEHUB_SEARCHES:
+            for page in (1, 2):
+                data = get_json("https://thehub.io/api/v2/jobsandfeatured",
+                                params={"countryCode": code, "search": term, "page": page}) or {}
+                block = data.get("jobs") or {}
+                for j in block.get("docs") or []:
+                    if j.get("id") in seen:
+                        continue
+                    seen.add(j.get("id"))
+                    loc = j.get("location") or {}
+                    where = ", ".join(x for x in (loc.get("locality"), loc.get("country") or country) if x)
+                    if j.get("isRemote"):
+                        where = f"Remote - {where}"
+                    jobs.append(_job("thehub", j.get("id"), j.get("title"), (j.get("company") or {}).get("name"),
+                                     where, f"https://thehub.io/jobs/{j.get('id')}", "", None, bool(j.get("isRemote"))))
+                if page >= (block.get("pages") or 1):
+                    break
+    # The list has no ad text: read the full ad for engineering titles only (max 60 extra calls).
+    # Also use the employer's own application link when The Hub has one (you prefer applying there).
+    for job in [j for j in jobs if re.search(DEVOPS_WORDS + r"|engineer", j["title"].lower())][:60]:
+        doc = (get_json(f"https://thehub.io/api/jobs/{job['id'].split(':', 1)[1]}") or {}).get("doc") or {}
+        job["description"] = strip_html(doc.get("description") or "")[:8000]
+        job["posted_at"] = doc.get("publishedAt") or doc.get("createdAt")
+        if doc.get("link"):
+            job["thehub_url"], job["url"] = job["url"], doc["link"]
     return jobs
 
 

@@ -156,7 +156,7 @@ def max_age(job: dict) -> int:
 SOURCES_WITH_REAL_POST_DATE = {"arbeitnow", "lever", "ashby", "bundesagentur", "recruitee",
                                "smartrecruiters", "personio", "workable",
                                "workday", "remotive", "remoteok", "himalayas", "jobicy",
-                               "nofluffjobs", "justjoin", "weworkremotely", "workingnomads", "jobindex", "eures", "jaabz", "teamtailor", "phenom", "successfactors", "cvonline", "linkedin"}
+                               "nofluffjobs", "justjoin", "weworkremotely", "workingnomads", "jobindex", "itjobbank", "thehub", "eures", "jaabz", "teamtailor", "phenom", "successfactors", "cvonline", "linkedin"}
 
 
 def age_in_days(job: dict) -> int | None:
