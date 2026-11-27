@@ -178,6 +178,7 @@ GREENHOUSE = [
     "forvismazars",            # added by find_companies
     "proton",            # added by find_companies
     "gitlabcrm",            # added by detect_ats
+    "zscaler",            # added by find_companies
 ]
 
 LEVER = [
