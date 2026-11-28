@@ -24,14 +24,20 @@ from jobhunter import outreach, salary, skill_fit
 API = "https://api.github.com"
 REPO = os.environ.get("DATA_REPO") or os.environ.get("GITHUB_REPOSITORY", "")   # Actions sets this
 AGGREGATORS = {"jobgether"}   # job boards that repost other employers' jobs
-MAX_PER_AGGREGATOR = 2       # issues per aggregator per run
+MAX_PER_AGGREGATOR = int(os.environ.get("MAX_PER_AGGREGATOR") or 0)   # reposting boards: off (Nov 2026 review)
+# Recruitment agencies / staffing firms: their ads rarely lead to a sponsored hire, so they are skipped.
+AGENCY = re.compile(r"recruit|staffing|personalberatung|personaldienst|headhunt|executive search|talent agency"
+                    r"|\bhays\b|^randstad(?! global)|michael page|harvey nash|computer futures|nigel frank|jefferson frank"
+                    r"|huxley|brightwater|morgan mckinley|\bcpl\b|fruition|haystack people|asta agency|it search"
+                    r"|hamilton barnes|darwin recruitment|angeheuert|nordkind|iq staffing", re.I)
+SKIP_AGENCIES = os.environ.get("SKIP_AGENCIES", "1") == "1"
 STRONG_RANK = 60             # rank 60+          -> issue labelled "fit-strong"
 STRETCH_RANK = 50            # rank 50-59        -> issue labelled "fit-stretch"
-TARGET_PER_RUN = 8           # if a run gives fewer than 8 issues, top up with the next best jobs...
-STRETCH_FLOOR = 45           # ...but never below rank 45 (below that it's noise)
+TARGET_PER_RUN = 6           # if a run gives fewer than 8 issues, top up with the next best jobs...
+STRETCH_FLOOR = 50           # ...but never below rank 50 (below that it's noise)
 MAX_ISSUES_PER_RUN = 10      # never flood your inbox
-MAX_NON_ENGLISH_PER_RUN = 2  # German/Dutch/Danish ads are hard to apply to: at most 2 issues per run
-MIN_FIT = 55                 # SKILL GATE: Gemini skill fit must be 55+ for ANY issue - a good title alone isn't enough
+MAX_NON_ENGLISH_PER_RUN = int(os.environ.get("MAX_NON_ENGLISH") or 0)  # German/Dutch/Danish ads: off (Nov 2026 review)
+MIN_FIT = int(os.environ.get("MIN_FIT") or 70)   # SKILL GATE: Gemini skill fit 70+ for ANY issue (was 55; raised Nov 2026)
 STRONG_FIT = 70              # "fit-strong" needs rank 60+ AND skill fit 70+
 
 LABELS = {   # name: colour (hex, no #)
@@ -152,13 +158,15 @@ def remember_jobs(jobs: list[dict]) -> None:
 def pick(jobs: list[dict], already: set[str]) -> list[dict]:
     """
     Choose which jobs become issues this run:
-      0. only jobs whose Gemini SKILL FIT is MIN_FIT (55)+ - titles and keywords can't carry a weak match
+      0. only jobs whose Gemini SKILL FIT is MIN_FIT (70)+, not from a recruitment agency, - titles and keywords can't carry a weak match
       1. every job with rank >= STRETCH_RANK (50)                      (strong + stretch)
       2. if that's fewer than TARGET_PER_RUN (8), add the next best jobs down to STRETCH_FLOOR (45)
     Jobs that already have an issue are ignored. Best first, max MAX_ISSUES_PER_RUN.
     """
     candidates, seen = [], set(already)
     for j in sorted((j for j in jobs if (j.get("fit") or {}).get("fit", 0) >= MIN_FIT), key=lambda j: j["rank"], reverse=True):
+        if SKIP_AGENCIES and AGENCY.search(j.get("company") or ""):
+            continue
         key = same_job_key(j["title"], j["company"])
         if j["id"] in seen or key in seen:
             continue

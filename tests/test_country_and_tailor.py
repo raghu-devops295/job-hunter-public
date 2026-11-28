@@ -177,3 +177,11 @@ def test_gulf_nationals_only_skipped():
     j = job("Dubai, UAE")
     j["description"] = "This role is open to UAE nationals only as part of Emiratisation."
     assert filters.find_dealbreaker(j) is not None
+
+
+def test_pick_skips_agencies_reposters_non_english_and_weak_fit():
+    mk = lambda c, f, r, lang="english": {"id": c, "title": "Senior DevOps Engineer " + c, "company": c, "rank": r,
+                                          "fit": {"fit": f}, "ad_language": lang}
+    jobs = [mk("Adyen", 80, 70), mk("Hays", 85, 80), mk("jobgether", 90, 80), mk("Bol", 60, 70),
+            mk("Siemens", 80, 70, "german"), mk("NORDkind Recruiting GmbH", 80, 70)]
+    assert [j["company"] for j in tracker.pick(jobs, set())] == ["Adyen"]
