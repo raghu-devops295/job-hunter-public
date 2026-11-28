@@ -490,8 +490,32 @@ def tailor(job: dict, gate: bool = True) -> dict:
         if not any(_has(k, master_text) for k in missing):
             print("   no missing keyword is on your master resume - stopping (honest gaps)")
             break
-    best.update(keywords=keywords, fixes=all_fixes, rounds=round_no, resume=resume)
+    best.update(keywords=keywords, fixes=all_fixes, rounds=round_no, resume=resume, region=region_of(job))
     return best
+
+
+# ---------------------------------------------------------------- resume version per region
+GULF = r"united arab emirates|\buae\b|u\.a\.e|dubai|abu dhabi|sharjah|ajman|saudi|\bksa\b|riyadh|jeddah|dammam|khobar|qatar|doha|bahrain|kuwait|oman|muscat"
+INDIA = r"\bindia\b|bangalore|bengaluru|hyderabad|pune|chennai|gurgaon|gurugram|noida|delhi|mumbai|kolkata|ahmedabad"
+
+
+def region_of(job: dict) -> str:
+    """Which resume version fits this job: 'gulf', 'india' or 'europe' (default). Remote jobs use 'europe'."""
+    where = f"{job.get('location') or ''}".lower()
+    if re.search(GULF, where):
+        return "gulf"
+    if re.search(INDIA, where) and not re.search(r"\bremote\b", where):
+        return "india"
+    return "europe"
+
+
+def contact_line2(resume: dict, region: str = "europe") -> str:
+    """Second header line (relocation / work permit / notice) for this region. Empty = no line."""
+    contact = resume.get("contact", {})
+    by_region = contact.get("line2_by_region") or {}
+    if region in by_region:
+        return by_region[region] or ""
+    return contact.get("line2", "")
 
 
 # ---------------------------------------------------------------- PDF (ATS-friendly)
@@ -526,8 +550,9 @@ def render_pdf(result: dict, path: Path) -> Path:
     story = [Paragraph(escape(resume["contact"]["name"]), st["name"]),
              Paragraph(escape(plan["headline"]), st["head"]),
              Paragraph(escape(resume["contact"]["line1"]), st["contact"])]
-    if resume["contact"].get("line2"):    # relocation / work-permit line, so a recruiter never has to guess
-        story.append(Paragraph(escape(resume["contact"]["line2"]), st["contact"]))
+    line2 = contact_line2(resume, result.get("region", "europe"))
+    if line2:    # relocation / work-permit line for this region (Europe / Gulf / India), so a recruiter never has to guess
+        story.append(Paragraph(escape(line2), st["contact"]))
     story += sec("Professional Summary") + [Paragraph(escape(plan["summary"]), st["body"])]
     story += sec("Core Skills") + [bullets([f"<b>{escape(g)}:</b> {escape(', '.join(i))}" for g, i in plan["skills"]])]
     story += sec("Professional Experience")

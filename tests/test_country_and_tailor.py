@@ -193,3 +193,14 @@ def test_agency_kept_only_with_visa_help():
     jobs = [mk("Hays", "Our client, a bank, offers visa sponsorship and relocation support."),
             mk("Huxley", "Great role, apply now."), mk("Adyen", "")]
     assert [j["company"] for j in tracker.pick(jobs, set())] == ["Hays", "Adyen"]
+
+
+def test_resume_region_and_header_line():
+    assert tailor.region_of({"location": "Dubai, United Arab Emirates"}) == "gulf"
+    assert tailor.region_of({"location": "Riyadh, KSA"}) == "gulf"
+    assert tailor.region_of({"location": "Bengaluru, Karnataka, India"}) == "india"
+    assert tailor.region_of({"location": "Remote - India"}) == "europe"
+    assert tailor.region_of({"location": "Amsterdam"}) == "europe"
+    r = {"contact": {"line2": "old", "line2_by_region": {"europe": "EU", "gulf": "GULF", "india": ""}}}
+    assert [tailor.contact_line2(r, g) for g in ("europe", "gulf", "india")] == ["EU", "GULF", ""]
+    assert tailor.contact_line2({"contact": {"line2": "old"}}, "gulf") == "old"
