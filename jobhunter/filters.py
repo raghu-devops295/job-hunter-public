@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 
 from jobhunter.scoring import MY_COUNTRIES
 
-LANGUAGES = r"(german|dutch|french|polish|danish|swedish|norwegian|finnish|lithuanian|estonian|latvian|russian|italian|spanish|czech|deutsch|nederlands)"
+LANGUAGES = r"(german|dutch|french|polish|danish|swedish|norwegian|finnish|lithuanian|estonian|latvian|russian|italian|spanish|czech|arabic|deutsch|nederlands)"
 
 # Phrases that mean "you MUST speak this language"
 LANGUAGE_REQUIRED = [
@@ -97,6 +97,8 @@ LOCAL_ONLY = [
     r"(citizens?|citizenship|permanent residen\w*|settled status|nationals?) (only|required|is required|is mandatory)",
     r"only (open to )?(eu |eea |[a-z]+ )?(citizens|nationals|permanent residents)",
     r"(must be|should be) (an? )?(eu |eea |[a-z]+ )?(citizen|national|permanent resident)",
+    # Gulf jobs reserved for locals (Emiratisation / Saudization)
+    r"emiratis? only|uae nationals?( only)?|emiratisation|emiratization|saudi nationals?( only)?|saudis? only|saudi[sz]ation|nitaqat",
     r"wohnsitz in (deutschland|der nähe) (ist )?(erforderlich|voraussetzung)|keine relocation",
     # remote jobs tied to one country (mostly US/Canada)
     r"(us|u\.s\.|united states|american|canadian) citizen(ship)?|green card",

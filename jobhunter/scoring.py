@@ -78,6 +78,9 @@ ALL_COUNTRIES = {
     "Spain": r"spain|españa|espana|,\s*es|madrid|barcelona|valencia|málaga|malaga|seville|sevilla|bilbao",
     "Estonia": r"estonia|eesti|,\s*ee|tallinn|tartu",
     "Lithuania": r"lithuania|lietuva|,\s*lt|vilnius|kaunas|klaipėda|klaipeda",
+    # Gulf (added Nov 2026): Dubai / Abu Dhabi and Riyadh / Jeddah
+    "United Arab Emirates": r"united arab emirates|\buae\b|u\.a\.e|,\s*ae|dubai|abu dhabi|sharjah|ajman|ras al khaimah",
+    "Saudi Arabia": r"saudi arabia|saudi|\bksa\b|k\.s\.a|riyadh|jeddah|jiddah|dammam|khobar|dhahran|neom",
 }
 
 # YOUR target countries come from ONE file: lists/countries.txt (best first). Edit that file only.

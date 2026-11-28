@@ -34,7 +34,7 @@ def test_focus_searches_and_title_filter(monkeypatch):
     assert any("location=Lithuania" in u for c in calls for u in c["urls"])
     # budget: worst case per month stays under Apify's $5 free usage (~$1 per 1,000 jobs)
     per_day = sum(c["limitPerSource"] * len(c["urls"]) for c in calls)
-    assert per_day == 143 and per_day * 30 / 1000 <= 4.6
+    assert per_day == 150 and per_day * 30 / 1000 <= 4.6
 
 
 def test_countries_override(monkeypatch):

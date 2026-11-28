@@ -56,11 +56,14 @@ BANDS = [
     (r"vilnius|kaunas|lithuania|lietuva", "Lithuania", "EUR", 50_000, 72_000),
     (r"tallinn|tartu|estonia|eesti", "Estonia", "EUR", 55_000, 78_000),
     (r"riga|latvia", "Latvia", "EUR", 45_000, 65_000),
+    # Gulf: salaries are tax-free; housing/transport allowances are often on top of base - ask for the full package
+    (r"dubai|abu dhabi|sharjah|united arab emirates|\buae\b", "United Arab Emirates", "AED", 240_000, 420_000),
+    (r"riyadh|jeddah|dammam|khobar|dhahran|neom|saudi", "Saudi Arabia", "SAR", 240_000, 420_000),
     (r"bucharest|romania|cluj|timi[sș]oara|ia[sș]i|bra[sș]ov|\bro\b|budapest|hungary|sofia|bulgaria|athens|greece", "South-East Europe", "EUR", 40_000, 65_000),
 ]
 FALLBACK = ("Europe (location unclear)", "EUR", 65_000, 95_000)
 
-SYMBOL = {"EUR": "€", "GBP": "£", "CHF": "CHF ", "DKK": "DKK ", "SEK": "SEK ", "NOK": "NOK ", "PLN": "PLN "}
+SYMBOL = {"AED": "AED ", "SAR": "SAR ", "EUR": "€", "GBP": "£", "CHF": "CHF ", "DKK": "DKK ", "SEK": "SEK ", "NOK": "NOK ", "PLN": "PLN "}
 
 # Visa minimums 2026 (gross per year) - an offer below these can't get the work permit
 VISA = {
@@ -75,12 +78,14 @@ VISA = {
     "PLN-PL": "Poland: work permit + D visa often takes 4-8 months from India - ask how long their last non-EU hire took and whether they can start you remotely from India meanwhile.",
     "EUR-CZ": "Czechia: ask if the employer is in the government 'Highly Qualified Worker' programme - it gets priority processing; without it, consulate appointments in India are scarce.",
     "EUR-AT": "Austria: EU Blue Card / Red-White-Red card; the authority's evaluation usually takes several weeks.",
+    "AED-AE": "UAE: the employer sponsors your work visa; get your degree certificates attested (India MEA + UAE embassy) early - it takes weeks.",
+    "SAR-SA": "Saudi Arabia: the employer sponsors your work visa (iqama); degree certificates must be attested (India MEA + Saudi embassy) - start early.",
     "EUR-IE": "Critical Skills Employment Permit minimum (from 1 Mar 2026): €40,904/yr with a relevant degree.",
 }
 COUNTRY_OF = {"Munich": "DE", "Frankfurt": "DE", "Berlin": "DE", "Hamburg": "DE", "Stuttgart/Düsseldorf/Cologne": "DE",
               "Germany": "DE", "Amsterdam": "NL", "Netherlands": "NL", "Dublin": "IE", "Ireland": "IE",
               "Finland": "FI", "Lithuania": "LT", "Estonia": "EE", "Sweden": "SE", "Denmark": "DK", "Poland": "PL",
-              "Czechia": "CZ", "Austria": "AT"}
+              "Czechia": "CZ", "Austria": "AT", "United Arab Emirates": "AE", "Saudi Arabia": "SA"}
 
 NOTES = {
     "NL": "On top: 8% holiday allowance. Ask HR whether you qualify for the 30% tax ruling.",
@@ -89,6 +94,8 @@ NOTES = {
     "PL": "Band is for an employment contract (UoP, gross). For B2B, ask ~15-20% more (no paid leave/benefits).",
     "SE": "On top: occupational pension (~4.5%+) and 25+ days holiday.",
     "FI": "On top: holiday bonus (lomaraha, ~half a month's pay) at most employers.",
+    "AE": "Tax-free. Compare the full package: base + housing + transport allowance, flights home, medical, end-of-service gratuity.",
+    "SA": "Tax-free. Compare the full package: base + housing + transport allowance, flights home, medical, end-of-service gratuity.",
     "DE": "Bonus, pension and benefits often add €5-15K on top of base.",
 }
 

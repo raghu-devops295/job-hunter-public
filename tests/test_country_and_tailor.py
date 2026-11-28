@@ -36,7 +36,8 @@ def test_other_countries_skipped(loc):
 
 def test_country_list_comes_from_file():
     assert scoring.TARGET_COUNTRIES == ["Netherlands", "Germany", "Ireland", "Denmark", "Finland",
-                                        "Sweden", "Luxembourg", "Spain", "Estonia", "Lithuania"]
+                                        "Sweden", "Luxembourg", "Spain", "Estonia", "Lithuania",
+                                        "United Arab Emirates", "Saudi Arabia"]
     assert set(scoring.MY_COUNTRIES) == set(scoring.COUNTRY_BONUS) == set(scoring.TARGET_COUNTRIES)
     assert scoring.COUNTRY_BONUS["Netherlands"] == 15 and scoring.COUNTRY_BONUS["Germany"] == 10
 
@@ -165,3 +166,14 @@ def test_strong_label_detected_for_nomad_jobs(monkeypatch):
     monkeypatch.chdir(__import__("tempfile").mkdtemp())
     tracker.publish([])
     assert open("data/auto_tailor.txt").read() == "7"
+
+
+@pytest.mark.parametrize("loc", ["Dubai, United Arab Emirates", "Abu Dhabi, UAE", "Riyadh, Saudi Arabia", "Jeddah, KSA"])
+def test_gulf_countries_kept(loc):
+    assert filters.location_dealbreaker(job(loc)) is None, loc
+
+
+def test_gulf_nationals_only_skipped():
+    j = job("Dubai, UAE")
+    j["description"] = "This role is open to UAE nationals only as part of Emiratisation."
+    assert filters.find_dealbreaker(j) is not None

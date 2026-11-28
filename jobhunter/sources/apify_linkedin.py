@@ -29,7 +29,7 @@ from jobhunter.sources.common import strip_html
 ACTOR = os.environ.get("APIFY_ACTOR", "curious_coder~linkedin-jobs-scraper")
 # (exact phrase, jobs per search in top-3 countries, jobs per search in other countries) - best first
 SEARCHES = [('"Azure DevOps"', 13, 5),
-            ('"DevOps Engineer"', 8, 3),
+            ('"DevOps Engineer"', 8, 2),
             ('"Platform Engineer"', 8, 0)]
 
 # Keep only real engineering titles in your field; drop the rest (sales, data, support, developers...).

@@ -65,6 +65,8 @@ AVAILABILITY = {
     "Poland": "I would relocate on a Polish work permit.",
     "Czechia": "I would relocate on a Czech Employee Card or EU Blue Card.",
     "Austria": "I would relocate on an EU Blue Card / Red-White-Red Card.",
+    "United Arab Emirates": "I would relocate on an employer-sponsored UAE work visa.",
+    "Saudi Arabia": "I would relocate on an employer-sponsored Saudi work visa.",
 }
 
 
