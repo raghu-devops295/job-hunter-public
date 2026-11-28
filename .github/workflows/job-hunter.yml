@@ -103,15 +103,19 @@ jobs:
 
       # LinkedIn job -> company's own careers site: save it and let "Find companies" detect its hiring
       # system, so from tomorrow the robot scans that company's whole careers site for matching roles.
-      - name: Save new company careers pages from LinkedIn
+      # The morning digest (Claude) saves employers from job-alert emails in the PRIVATE repo's lists/;
+      # copy the new ones here too (company names and careers URLs only).
+      - name: Save new companies and careers pages (LinkedIn + job-alert emails)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DATA_REPO_TOKEN }}
         run: |
-          git add lists/linkedin_careers_urls.txt 2>/dev/null || true
-          if git diff --cached --quiet; then echo "No new careers pages."; exit 0; fi
+          python tools/pull_alert_lists.py || echo "Could not read the private alert lists."
+          git add lists/linkedin_careers_urls.txt lists/alerts_companies.txt lists/alerts_careers_urls.txt 2>/dev/null || true
+          if git diff --cached --quiet; then echo "No new companies or careers pages."; exit 0; fi
           git config user.name "job-hunter bot"
           git config user.email "job-hunter-bot@users.noreply.github.com"
-          git commit -q -m "Add company careers pages seen on LinkedIn"
+          git commit -q -m "Add companies and careers pages (LinkedIn + job alerts)"
           for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
           gh workflow run find-companies.yml --ref main && echo "Started Find companies."
 
