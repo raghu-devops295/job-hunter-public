@@ -185,3 +185,11 @@ def test_pick_skips_agencies_reposters_non_english_and_weak_fit():
     jobs = [mk("Adyen", 80, 70), mk("Hays", 85, 80), mk("jobgether", 90, 80), mk("Bol", 60, 70),
             mk("Siemens", 80, 70, "german"), mk("NORDkind Recruiting GmbH", 80, 70)]
     assert [j["company"] for j in tracker.pick(jobs, set())] == ["Adyen"]
+
+
+def test_agency_kept_only_with_visa_help():
+    mk = lambda c, d: {"id": c, "title": "Senior DevOps Engineer " + c, "company": c, "rank": 70,
+                       "fit": {"fit": 80}, "ad_language": "english", "description": d}
+    jobs = [mk("Hays", "Our client, a bank, offers visa sponsorship and relocation support."),
+            mk("Huxley", "Great role, apply now."), mk("Adyen", "")]
+    assert [j["company"] for j in tracker.pick(jobs, set())] == ["Hays", "Adyen"]

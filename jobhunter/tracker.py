@@ -31,6 +31,19 @@ AGENCY = re.compile(r"recruit|staffing|personalberatung|personaldienst|headhunt|
                     r"|huxley|brightwater|morgan mckinley|\bcpl\b|fruition|haystack people|asta agency|it search"
                     r"|hamilton barnes|darwin recruitment|angeheuert|nordkind|iq staffing", re.I)
 SKIP_AGENCIES = os.environ.get("SKIP_AGENCIES", "1") == "1"
+# Some employers (banks, big corporates) hire ONLY through agencies. An agency ad is kept when it says the
+# employer helps with visa / relocation (VISA_HELP words) - max MAX_AGENCY_PER_RUN per run, labelled via-agency.
+MAX_AGENCY_PER_RUN = int(os.environ.get("MAX_AGENCY_PER_RUN") or 2)
+
+
+def is_agency(job: dict) -> bool:
+    return bool(AGENCY.search(job.get("company") or ""))
+
+
+def agency_ok(job: dict) -> bool:
+    """Agency ad worth sending: it mentions visa sponsorship / relocation help."""
+    from jobhunter.scoring import VISA_HELP
+    return bool(re.search(VISA_HELP, (job.get("description") or "").lower()))
 STRONG_RANK = 60             # rank 60+          -> issue labelled "fit-strong"
 STRETCH_RANK = 50            # rank 50-59        -> issue labelled "fit-stretch"
 TARGET_PER_RUN = 6           # if a run gives fewer than 8 issues, top up with the next best jobs...
@@ -45,7 +58,7 @@ LABELS = {   # name: colour (hex, no #)
     "offer": "b60205", "rejected": "cccccc",
     "fit-strong": "0e8a16", "fit-stretch": "fbca04", "nomad-remote": "1d76db",
     "tailor": "c5def5", "tailored": "0052cc", "needs-review": "d93f0b",
-    "ad-not-english": "f9d0c4",
+    "ad-not-english": "f9d0c4", "via-agency": "c5def5",
 }
 
 
@@ -139,6 +152,8 @@ def _issue_text(job: dict) -> tuple[str, str, list[str]]:
     labels = ["job", "new", "fit-strong" if strong else "fit-stretch"]
     if job.get("nomad"):
         labels.append("nomad-remote")
+    if is_agency(job):
+        labels.append("via-agency")   # posted by a recruiter: ask them who the employer is and whether they sponsor
     if job.get("ad_language") not in (None, "", "english"):
         labels.append("ad-not-english")   # the ad is not in English: check the language rule before applying
     return title, "\n".join(lines), labels
@@ -165,7 +180,7 @@ def pick(jobs: list[dict], already: set[str]) -> list[dict]:
     """
     candidates, seen = [], set(already)
     for j in sorted((j for j in jobs if (j.get("fit") or {}).get("fit", 0) >= MIN_FIT), key=lambda j: j["rank"], reverse=True):
-        if SKIP_AGENCIES and AGENCY.search(j.get("company") or ""):
+        if SKIP_AGENCIES and is_agency(j) and not agency_ok(j):
             continue
         key = same_job_key(j["title"], j["company"])
         if j["id"] in seen or key in seen:
@@ -177,6 +192,8 @@ def pick(jobs: list[dict], already: set[str]) -> list[dict]:
         extra = [j for j in candidates if STRETCH_FLOOR <= j["rank"] < STRETCH_RANK]
         chosen += extra[:TARGET_PER_RUN - len(chosen)]
     chosen = _cap_non_english(chosen)
+    agency = [j for j in chosen if is_agency(j)][:MAX_AGENCY_PER_RUN]
+    chosen = [j for j in chosen if not is_agency(j) or j in agency]
     return _cap_aggregators(chosen)[:MAX_ISSUES_PER_RUN]
 
 
